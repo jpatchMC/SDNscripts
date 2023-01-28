@@ -40,7 +40,7 @@ def input_check(ask):#this is to enforce that questions are answered, dosen't ch
 
 def IPchecker(new):
     while True:
-        new = input(new)
+        new = input("what will the management IP be?: ")
         check_number =new.replace(".","")
         if check_number.isnumeric(): 
             IP_check = new.split(".") #i need to check them individually
@@ -55,6 +55,7 @@ def IPchecker(new):
                 D = int(D)
                 if A <= 255 and B <= 255 and C <= 255 and D <= 254:
                     print(f"{new} is valid")
+                    #break
                     return new
                 else:
                     print("needs to be a valid IP address")
@@ -62,15 +63,15 @@ def IPchecker(new):
                     #new = input("what will its management IP be?: ")
                     #return new #something is up with my elses not "pinging" correct input, using old even if wrong
             else:
-                print("need to be a properly formatted IP address(numbers)")
+                print("need to be a properly formatted IP address(3 digets, dot 3 more. 4 groups total)")
                 #new = input("what will its management IP be?: ")
                 #return new
                 continue
         else:
-            print("needs to be a valid IP address")
+            print("needs to be a valid IP address(with numbers)")
             #new = input("what will its management IP be?: ")
             #return new
             continue
-
+    #return new
 if __name__ =="__main__":
     main()
