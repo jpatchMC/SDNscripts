@@ -9,7 +9,7 @@ def ping(wut):#ping table
         #for address in items['mgmtIP']:
         #print(items['mgmtIP']) 
 def main():
-    global devices
+    global devices 
     ping(devices)
     #while True:
     change_affirm =input("want to add a new device? y/n: ")
@@ -31,19 +31,25 @@ def main():
         print("incorrect input, exiting")
 
 def input_check(ask):#this is to enforce that questions are answered, dosen't check for null values in actual Dict
-    while True:
+    valid_bool = True
+    while valid_bool == True:
+    #while True:
         input_cont = input(ask)
         if input_cont == "":
             print("I Need something here.")
+            valid_bool == True
         else:
             return input_cont
+            #valid_bool == False # i guess i don't need...the return
 
-def IPchecker(new):
-    while True:
-        new = input("what will the management IP be?: ")
-        check_number =new.replace(".","")
+def IPchecker(ip_check):
+    valid_bool = True
+    while valid_bool == True:
+    #while True:
+        ip_check = input("what will the management IP be?: ")
+        check_number =ip_check.replace(".","")
         if check_number.isnumeric(): 
-            IP_check = new.split(".") #i need to check them individually
+            IP_check = ip_check.split(".") #i need to check them individually
             if len(IP_check) == 4:
                 A = IP_check[0]
                 B = IP_check[1]
@@ -54,24 +60,29 @@ def IPchecker(new):
                 C = int(C)
                 D = int(D)
                 if A <= 255 and B <= 255 and C <= 255 and D <= 254:
-                    print(f"{new} is valid")
+                    print(f"{ip_check} is valid")
                     #break
-                    return new
+                    return ip_check
                 else:
                     print("needs to be a valid IP address")
-                    continue
+                    #continue
+                    valid_bool = True
                     #new = input("what will its management IP be?: ")
                     #return new #something is up with my elses not "pinging" correct input, using old even if wrong
             else:
                 print("need to be a properly formatted IP address(3 digets, dot 3 more. 4 groups total)")
                 #new = input("what will its management IP be?: ")
                 #return new
-                continue
+                valid_bool = True
+                #continue
+
         else:
             print("needs to be a valid IP address(with numbers)")
             #new = input("what will its management IP be?: ")
             #return new
-            continue
+            valid_bool = True
+            #continue
+            
     #return new
 if __name__ =="__main__":
     main()
