@@ -9,9 +9,9 @@ def ping(wut):#ping table
         #for address in items['mgmtIP']:
         #print(items['mgmtIP']) 
 def main():
-    global devices 
+    global devices #i could put the actual varible here but....why?
     ping(devices)
-    #while True:
+    #while True: not needed
     change_affirm =input("want to add a new device? y/n: ")
     change_affirm = change_affirm.lower()
     if change_affirm == "n":
@@ -26,6 +26,7 @@ def main():
         IP = IPchecker("what will the management IP be?: ")
         devices[hostname] = {"type": dev_Type, "hostname": hostname, "mgmtIP": IP}
         print("checking known Management IPs")
+        print(devices)
         ping(devices)
     else:
         print("incorrect input, exiting")
