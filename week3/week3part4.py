@@ -23,10 +23,11 @@ def main():
         #while True:
         #IP = input_check("what will its management IP be?: ")
         #IPchecker(IP)
-        IP = IPchecker("what will the management IP be?: ")
+        question = "what will the management IP be?: "
+        IP = IPchecker(question)
         devices[hostname] = {"type": dev_Type, "hostname": hostname, "mgmtIP": IP}
         print("checking known Management IPs")
-        print(devices)
+        print(F"{devices.values()}")
         ping(devices)
     else:
         print("incorrect input, exiting")
@@ -43,23 +44,23 @@ def input_check(ask):#this is to enforce that questions are answered, dosen't ch
             return input_cont
             #valid_bool == False # i guess i don't need...the return
 
-def IPchecker(ip_check):
+def IPchecker(ip_ask): #ip ask is a string thats a question define in main
     valid_bool = True
     while valid_bool == True:
     #while True:
-        ip_check = input("what will the management IP be?: ")
+        ip_check = input(ip_ask)
         check_number =ip_check.replace(".","")
         if check_number.isnumeric(): 
             IP_check = ip_check.split(".") #i need to check them individually
             if len(IP_check) == 4:
-                A = IP_check[0]
-                B = IP_check[1]
-                C = IP_check[2]
-                D = IP_check[3]
-                A = int(A)
-                B = int(B)
-                C = int(C)
-                D = int(D)
+                A = int(IP_check[0])
+                B = int(IP_check[1])
+                C = int(IP_check[2])
+                D = int(IP_check[3])
+                #A = int(A)
+                #B = int(B)
+                #C = int(C)
+                #D = int(D)
                 if A <= 255 and B <= 255 and C <= 255 and D <= 254:
                     print(f"{ip_check} is valid")
                     #break
