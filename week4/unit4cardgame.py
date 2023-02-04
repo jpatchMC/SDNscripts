@@ -48,14 +48,14 @@ def main():
     who_won(cpupoints,usrpoints)
 
 
-def who_won(CPU,USER): #run compare logic against cpu and usr point totals
-    if int(CPU) >= int(USER):
-        winna = int(CPU) - int(USER)
+def who_won(cpu,user): #run compare logic against cpu and usr point totals
+    if int(cpu) >= int(user):
+        winna = int(cpu) - int(user)
         print(f"the computer won by {winna} points!\nyou suck with buttons I guess.")
-    elif int(CPU) <= int(USER):
-        winna = int(USER) - int(CPU)
+    elif int(cpu) <= int(user):
+        winna = int(user) - int(cpu)
         print(f"You won by {winna} points!")
-    elif int(CPU) == int(USER):
+    elif int(cpu) == int(user):
         print("a damn tie")   
 
 def deal(): #makes new deck, shuffles, single deck
