@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#written by Josh Patch....i'm sure there are some issues with this but i didn't consult chatgtp or anything else so pretty proud of this
 import requests
 
 #url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
