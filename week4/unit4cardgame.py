@@ -49,10 +49,10 @@ def main():
 
 
 def who_won(cpu,user): #run compare logic against cpu and usr point totals
-    if int(cpu) >= int(user):
+    if int(cpu) > int(user):
         winna = int(cpu) - int(user)
         print(f"the computer won by {winna} points!\nyou suck with buttons I guess.")
-    elif int(cpu) <= int(user):
+    elif int(cpu) < int(user):
         winna = int(user) - int(cpu)
         print(f"You won by {winna} points!")
     elif int(cpu) == int(user):
@@ -72,7 +72,7 @@ def drawing_of_cards(deck_ID,draw_cnt):#for draw X number of cards
     response = requests.request("GET", url, headers=headers, data=payload)
     return response
 
-def card_NUM_conv(card):#fucking this shit up! this little boi check to see if a card is a face card and coverts to 10, USE WITHIN FOR LOOP
+def card_NUM_conv(card):# this boi checks to see if a card is a face card and coverts to 10, USE WITHIN FOR LOOP
     #points=0
     #for cardcpu in drawncards['cards']:
         #print(f"{cardcpu['value']} of {cardcpu['suit']}")
