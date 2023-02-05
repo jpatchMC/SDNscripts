@@ -1,0 +1,3 @@
+.terraform
+.pyc
+__pycache__/
