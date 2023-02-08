@@ -6,47 +6,49 @@ import requests
 payload ={}
 headers ={}
 def main():
-    #url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
     
-
-    responsem = deal()
-
-    deck = responsem.json()
-    print("ok so the game is cpu draws card and you draw cards\nyou can choose the number of cards drawn (between 1 and 5)\nthen the cards are totaled up and whoever\nhas the most wins\noh almost forgot face cards are worth 10 points.")
-    print(f"Deck ID is {deck['deck_id']}\n")
-    if deck['shuffled'] == True:
-        print("deck is shuffled\n")
-    deck_ID=deck['deck_id']
+    rules="ok so the game is cpu draws card and you draw cards\nyou can choose the number of cards drawn (between 1 and 5)\nthen the cards are totaled up and whoever\nhas the most wins\noh almost forgot face cards are worth 10 points."
     cardsREQ= "how many card would you like us both to draw for our war?\n0-5 (0 means quit btw): "
+    asking_num_decks="how many Decks? "
+    print(rules)
+    #ask number of decks
+    askdecks = input(asking_num_decks)
+    deck_number=get_many_deck(askdecks,asking_num_decks)
+    response_MAIN=shuffle_deck(deck_number)
+    deck = response_MAIN.json()
+    
+    deck_ID=deck['deck_id']
+    print(f"Deck ID is {deck_ID}\n")
+    
+    #ask number of cards
     draw_cnt = input(cardsREQ)
     enforceCARD(draw_cnt,cardsREQ)
 
-
-
-
+    #draw cards
     responsecpu = drawing_of_cards(deck_ID,draw_cnt)
     drewcpu = responsecpu.json()
+
     #draw and add up cpu cards
-    cpupoints=0
     print("the computer draws:")
-    for cardcpu in drewcpu['cards']:
-        print(f"{cardcpu['value']} of {cardcpu['suit']}")
-        card_NUM_conv(cardcpu)
-        cpupoints = cpupoints + int(cardcpu['value'])
+    cpupoints = score(drewcpu)
     print(f"and got {cpupoints} points\n")
+
     #draw and add up usr cards
     print("you draw:")
     usrresponse = drawing_of_cards(deck_ID,draw_cnt)
     drewusr =usrresponse.json()
-    usrpoints=0
-    for cardusr in drewusr['cards']:
-        print(f"{cardusr['value']} of {cardusr['suit']}")
-        card_NUM_conv(cardusr)
-        usrpoints = usrpoints + int(cardusr['value'])
+    usrpoints = score(drewusr)
     print(f"and got {usrpoints} points\n")
 
     who_won(cpupoints,usrpoints)
 
+def score(player):
+    points = 0
+    for card in player['cards']:
+        print(f"{card['value']} of {card['suit']}")
+        card_NUM_conv(card)
+        points = points + int(card['value'])
+    return points
 
 def who_won(cpu,user): #run compare logic against cpu and usr point totals
     if int(cpu) > int(user):
@@ -58,8 +60,9 @@ def who_won(cpu,user): #run compare logic against cpu and usr point totals
     elif int(cpu) == int(user):
         print("a damn tie")   
 
-def deal(): #makes new deck, shuffles, single deck
-    url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
+
+def shuffle_deck(deckcnt): #makes new deck, shuffles, 
+    url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=" + deckcnt
     global payload 
     global headers
     response = requests.request("GET", url, headers=headers, data=payload)
@@ -91,6 +94,19 @@ def card_NUM_conv(card):# this boi checks to see if a card is a face card and co
     #points = points + int(card['value'])
     #return points
 
+def get_many_deck(askdecks,querynum):
+    chk_bool = True
+    while chk_bool == True:
+        if int(askdecks)  <= 3:
+            #print(askdecks)
+            chk_bool = False
+            return askdecks   
+        else:
+            print("needs to be less then 3")
+            askdecks=input(querynum)
+            #print(askdecks)
+            chk_bool = True
+
 def enforceCARD(draw_cnt,cardsREQ):
     enforce = True
     while enforce == True:
@@ -107,3 +123,5 @@ def enforceCARD(draw_cnt,cardsREQ):
 
 if __name__== "__main__" :
     main()
+
+#https://github.com/jpatchMC/SDNscripts/tree/main/week4
