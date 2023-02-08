@@ -20,7 +20,7 @@ def get_many_deck(askdecks,querynum):
     chk_bool = True
     while chk_bool == True:
         if int(askdecks)  <= 3:
-            print(askdecks)
+            #print(askdecks)
             chk_bool = False
             return askdecks   
         else:

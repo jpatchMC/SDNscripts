@@ -7,10 +7,11 @@ payload ={}
 headers ={}
 def main():
     
-    rules="ok so the game is cpu draws card and you draw cards\nyou can choose the number of cards drawn (between 1 and 5)\nthen the cards are totaled up and whoever\nhas the most wins\noh almost forgot face cards are worth 10 points."
+    #rules="ok so the game is cpu draws card and you draw cards\nyou can choose the number of cards drawn (between 1 and 5)\nthen the cards are totaled up and whoever\nhas the most wins\noh almost forgot face cards are worth 10 points."
     cardsREQ= "how many card would you like us both to draw for our war?\n0-5 (0 means quit btw): "
     asking_num_decks="how many Decks? "
-    print(rules)
+    #print(rules)
+    printrulez()
     #ask number of decks
     askdecks = input(asking_num_decks)
     deck_number=get_many_deck(askdecks,asking_num_decks)
@@ -18,7 +19,7 @@ def main():
     deck = response_MAIN.json()
     
     deck_ID=deck['deck_id']
-    print(f"Deck ID is {deck_ID}\n")
+    #print(f"Deck ID is {deck_ID}\n")
     
     #ask number of cards
     draw_cnt = input(cardsREQ)
@@ -111,8 +112,9 @@ def enforceCARD(draw_cnt,cardsREQ):
         else:
             draw_cnt=input(cardsREQ)
             enforce=True
-
-
+def printrulez():
+    rules ="ok so the game is cpu draws card and you draw cards\nyou can choose the number of cards drawn (between 1 and 5)\nthen the cards are totaled up and whoever\nhas the most wins\noh almost forgot face cards are worth 10 points."
+    print(rules)
 if __name__== "__main__" :
     main()
 
