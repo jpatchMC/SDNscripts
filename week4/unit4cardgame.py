@@ -76,23 +76,15 @@ def drawing_of_cards(deck_ID,draw_cnt):#for draw X number of cards
     return response
 
 def card_NUM_conv(card):# this boi checks to see if a card is a face card and coverts to 10, USE WITHIN FOR LOOP
-    #points=0
-    #for cardcpu in drawncards['cards']:
-        #print(f"{cardcpu['value']} of {cardcpu['suit']}")
     if card['value'] == "KING":
-            #print("face")
             card['value'] = "10"
     elif card['value'] == "QUEEN":
-            #print("face")
             card['value'] = "10"
     elif card['value'] == "JACK":
-            #print("face")
             card['value'] = "10"
     elif card['value'] == "ACE":
-            #print("face")
             card['value'] = "10"
-    #points = points + int(card['value'])
-    #return points
+    
 
 def get_many_deck(askdecks,querynum):
     chk_bool = True
