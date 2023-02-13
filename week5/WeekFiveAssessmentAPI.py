@@ -61,6 +61,6 @@ def linkstatetable(intlist,protolist,link_state_list,ip_add_list):
   #print(f"{intlist[4]}\t\t{protolist[4]}\t\t{link_state_list[4]}\t\t{ip_add_list[4]}")
   #print(f"{intlist[5]}\t\t{protolist[5]}\t\t{link_state_list[5]}\t\t{ip_add_list[5]}")  
   #print(f"{intlist[6]}\t\t{protolist[6]}\t\t{link_state_list[6]}\t\t{ip_add_list[6]}")
-  #i left the other bittle stuff so you know what i mean for the range save 
+  #i left the other brittle stuff so you know what i mean for the range save 
 if __name__== "__main__" :
     main()
