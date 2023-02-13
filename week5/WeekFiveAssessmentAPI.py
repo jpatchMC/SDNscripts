@@ -63,6 +63,8 @@ def linkstatetable(intlist,protolist,link_state_list,ip_add_list):
   print("-"*100)
   for count in range(len(intlist)):#chat gtp for the save with range
     print(f"{intlist[count]}\t\t{protolist[count]}\t\t{link_state_list[count]}\t\t{ip_add_list[count]}")
+    for interface, protocol, state, ip in zip(intlist,protolist,link_state_list,ip_add_list):# lol this is from tiktok
+      print(interface, protocol, state, ip sep='\t\t')
   #print(f"{intlist[count]}\t\t{protolist[count]}\t\t{link_state_list[count]}\t\t{ip_add_list[count]}")
   #print(f"{intlist[1]}\t\t{protolist[1]}\t\t{link_state_list[1]}\t\t{ip_add_list[1]}")
   #print(f"{intlist[2]}\t\t{protolist[2]}\t\t{link_state_list[2]}\t\t{ip_add_list[2]}")
