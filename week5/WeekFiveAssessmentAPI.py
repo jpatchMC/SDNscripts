@@ -31,16 +31,14 @@ def main():
   '''
 
   response = requests.post(url,data=json.dumps(payload), verify=False,headers=myheaders,auth=(switchuser,switchpassword)).json()
-  intlist = []
-  protolist =[]
+  int_list = []
+  proto_list =[]
   link_state_list =[]
   ip_add_list=[]
-  linkstatelist(response,intlist,protolist,link_state_list,ip_add_list)
-  #print(intlist)
-  #print(protolist)
-  #print(link_state_list)
-  #print(ip_add_list)
-  linkstatetable(intlist,protolist,link_state_list,ip_add_list)
+  linkstatelist(response,int_list,proto_list,link_state_list,ip_add_list)
+  linkstatetable(int_list,proto_list,link_state_list,ip_add_list)
+
+  #gets fed empty lists,trims fat off "response", iterates through trimmed response, and appends empty lists with values base on the key for a given list 
 def linkstatelist(response,intlist,protolist,link_state_list,ip_add_list):
   for result in response['result']['body']['TABLE_intf']['ROW_intf']:#
     #print (result)
@@ -48,7 +46,7 @@ def linkstatelist(response,intlist,protolist,link_state_list,ip_add_list):
     protolist.append(result['proto-state'])  
     link_state_list.append(result['link-state'])
     ip_add_list.append(result['prefix'])
-
+  #create formated table based on lists and created with linkstatelist (or empty if forgotten) new line as long as there is information within line (if no 7 items there won't be a 7th row because errors)
 def linkstatetable(intlist,protolist,link_state_list,ip_add_list):
   print(f"Name\t\tProto\t\tLink\t\tAddress")
   print("-"*100)
