@@ -7,6 +7,22 @@ Be sure to run feature nxapi first on Nexus Switch
 
 """
 #i left your code as my main i suppose i should change that ill ask
+
+
+def main():
+
+  response = DennyBase()
+  #made empty list to pass value into also to pass in and out of func below
+  intlist = []
+  protolist =[]
+  link_state_list =[]
+  ip_add_list=[]
+  linkstatelist(response,intlist,protolist,link_state_list,ip_add_list)
+  #print(intlist)
+  #print(protolist)
+  #print(link_state_list)
+  #print(ip_add_list)
+  linkstatetable(intlist,protolist,link_state_list,ip_add_list)
 def DennyBase():
   switchuser='cisco'
   switchpassword='cisco'
@@ -30,24 +46,8 @@ def DennyBase():
   verify=False below is to accept untrusted certificate
 
   '''
-
   response = requests.post(url,data=json.dumps(payload), verify=False,headers=myheaders,auth=(switchuser,switchpassword)).json()
   return response
-def main():
-
-  response = DennyBase()
-  #made empty list to pass value into also to pass in and out of func below
-  intlist = []
-  protolist =[]
-  link_state_list =[]
-  ip_add_list=[]
-  linkstatelist(response,intlist,protolist,link_state_list,ip_add_list)
-  #print(intlist)
-  #print(protolist)
-  #print(link_state_list)
-  #print(ip_add_list)
-  linkstatetable(intlist,protolist,link_state_list,ip_add_list)
-
 #i create 4 lists far within the json output
 def linkstatelist(response,intlist,protolist,link_state_list,ip_add_list):
   for MEATY_result in response['result']['body']['TABLE_intf']['ROW_intf']:#
