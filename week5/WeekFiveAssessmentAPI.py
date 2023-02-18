@@ -6,7 +6,24 @@ import json
 Be sure to run feature nxapi first on Nexus Switch
 
 """
+#i left your code as my main i suppose i should change that ill ask
+
+
 def main():
+
+  response = DennyBase()
+  #made empty list to pass value into also to pass in and out of func below
+  intlist = []
+  protolist =[]
+  link_state_list =[]
+  ip_add_list=[]
+  linkstatelist(response,intlist,protolist,link_state_list,ip_add_list)
+  #print(intlist)
+  #print(protolist)
+  #print(link_state_list)
+  #print(ip_add_list)
+  linkstatetable(intlist,protolist,link_state_list,ip_add_list)
+def DennyBase():
   switchuser='cisco'
   switchpassword='cisco'
 
@@ -29,29 +46,27 @@ def main():
   verify=False below is to accept untrusted certificate
 
   '''
-
   response = requests.post(url,data=json.dumps(payload), verify=False,headers=myheaders,auth=(switchuser,switchpassword)).json()
-  int_list = []
-  proto_list =[]
-  link_state_list =[]
-  ip_add_list=[]
-  linkstatelist(response,int_list,proto_list,link_state_list,ip_add_list)
-  linkstatetable(int_list,proto_list,link_state_list,ip_add_list)
-
-  #gets fed empty lists,trims fat off "response", iterates through trimmed response, and appends empty lists with values base on the key for a given list 
+  return response
+#i create 4 lists far within the json output
 def linkstatelist(response,intlist,protolist,link_state_list,ip_add_list):
-  for result in response['result']['body']['TABLE_intf']['ROW_intf']:#
+  for MEATY_result in response['result']['body']['TABLE_intf']['ROW_intf']:#
     #print (result)
-    intlist.append(result['intf-name'])
-    protolist.append(result['proto-state'])  
-    link_state_list.append(result['link-state'])
-    ip_add_list.append(result['prefix'])
-  #create formated table based on lists and created with linkstatelist (or empty if forgotten) new line as long as there is information within line (if no 7 items there won't be a 7th row because errors)
+    intlist.append(MEATY_result['intf-name'])
+    protolist.append(MEATY_result['proto-state'])  
+    link_state_list.append(MEATY_result['link-state'])
+    ip_add_list.append(MEATY_result['prefix'])
+
+#i print lists one slice at a time per list to make a formatted table
 def linkstatetable(intlist,protolist,link_state_list,ip_add_list):
   print(f"Name\t\tProto\t\tLink\t\tAddress")
   print("-"*100)
   for count in range(len(intlist)):#chat gtp for the save with range
     print(f"{intlist[count]}\t\t{protolist[count]}\t\t{link_state_list[count]}\t\t{ip_add_list[count]}")
+  print(f"\nName\t\tProto\t\tLink\t\tAddress")
+  print("-"*75)
+  for interface, protocol, state, ip in zip(intlist,protolist,link_state_list,ip_add_list):# lol this is from tiktok
+    print(interface, protocol, state, ip, sep="\t\t")
   #print(f"{intlist[count]}\t\t{protolist[count]}\t\t{link_state_list[count]}\t\t{ip_add_list[count]}")
   #print(f"{intlist[1]}\t\t{protolist[1]}\t\t{link_state_list[1]}\t\t{ip_add_list[1]}")
   #print(f"{intlist[2]}\t\t{protolist[2]}\t\t{link_state_list[2]}\t\t{ip_add_list[2]}")
