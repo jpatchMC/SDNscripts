@@ -18,10 +18,6 @@ def main():
   link_state_list =[]
   ip_add_list=[]
   linkstatelist(response,intlist,protolist,link_state_list,ip_add_list)
-  #print(intlist)
-  #print(protolist)
-  #print(link_state_list)
-  #print(ip_add_list)
   linkstatetable(intlist,protolist,link_state_list,ip_add_list)
 def DennyBase():
   switchuser='cisco'
