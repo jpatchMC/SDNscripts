@@ -43,7 +43,7 @@ def isnamegud():
     return host_name
 #just adds 2 to the 3rd oct after being validated in another func
 def IP_add(IP_as_list):
-    IP_as_list[2]= int(IP_as_list[2]) + 2
+    IP_as_list[2]= str(int(IP_as_list[2]) + 2)
     new_IP = '.'.join(IP_as_list)
     return new_IP
     
@@ -53,7 +53,7 @@ def IP_check():#notice: at the the return of this is still a list
     valid_bool = True
     while valid_bool == True:
         #while True:
-        ip_check = input("enter an IP address to be changed")
+        ip_check = input("enter an IP address to be changed:\n")
         check_number =ip_check.replace(".","")
         if check_number.isnumeric(): 
             IP_check_splitlist = ip_check.split(".") #i need to check them individually
@@ -73,7 +73,7 @@ def IP_check():#notice: at the the return of this is still a list
 def main():
     name_change = isnamegud()
     commands(name_change)
-    IP_change = IP_check() #here down still needs testing
+    IP_change = IP_check() 
     newIP = IP_add(IP_change)
     print(f"new IP adress is {newIP}")
 
