@@ -41,12 +41,41 @@ def isnamegud():
             print("ERROR: needs to alphanumeric")
             checkif = True
     return host_name
+#just adds 2 to the 3rd oct after being validated in another func
+def IP_add(IP_as_list):
+    IP_as_list[2]= int(IP_as_list[2]) + 2
+    new_IP = '.'.join(IP_as_list)
+    return new_IP
+    
 
+#checks for valid IP but since the 3rd oct is being added 2 to, i can't be 255, has to be 253 or it won't be valid later
+def IP_check():#notice: at the the return of this is still a list
+    valid_bool = True
+    while valid_bool == True:
+        #while True:
+        ip_check = input("enter an IP address to be changed")
+        check_number =ip_check.replace(".","")
+        if check_number.isnumeric(): 
+            IP_check_splitlist = ip_check.split(".") #i need to check them individually
+            if len(IP_check_splitlist) == 4:
+                A = int(IP_check_splitlist[0])
+                B = int(IP_check_splitlist[1])
+                C = int(IP_check_splitlist[2])
+                D = int(IP_check_splitlist[3])
+                if A <= 255 and B <= 255 and C <= 253 and D <= 254:
+                    print(f"{ip_check} is valid")
+                    return IP_check_splitlist
+                else:
+                    print("ERROR: needs to be a valid IP address")
+                    valid_bool = True
 
 
 def main():
     name_change = isnamegud()
     commands(name_change)
+    IP_change = IP_check() #here down still needs testing
+    newIP = IP_add(IP_change)
+    print(f"new IP adress is {newIP}")
 
 
 
