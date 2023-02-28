@@ -35,8 +35,10 @@ def isnamegud():
     checkif = True
     while checkif == True:
         host_name= input("change host name to what?:\n")
-        if host_name.isalnum():#isalnum from w3schools            
+        if host_name.isalnum() and host_name[0].isalpha():#isalnum from w3schools
+                        
             checkif = False
+
         else:
             print("ERROR: needs to alphanumeric")
             checkif = True
