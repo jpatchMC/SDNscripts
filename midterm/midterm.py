@@ -95,10 +95,10 @@ def IP_change(vlan_only_ipddy_dict):
     return updated_intIP_dict
 
 #changes IP on cisco device    
-def command_to_change_IP_on_device(int_name,ip,MGMT_IP):
+def command_to_change_IP_on_device(int_name,ip,Mgmt_IP):
     switchuser='cisco'
     switchpassword='cisco'
-    url='https://'+MGMT_IP+'/ins'
+    url='https://'+Mgmt_IP+'/ins'
     myheaders={'content-type':'application/json-rpc'}
     payload=[
     {
@@ -142,12 +142,14 @@ def command_to_change_IP_on_device(int_name,ip,MGMT_IP):
 def main():
     devices = {"dist-sw01" : "10.10.20.177","dist-sw02" : "10.10.20.178"}
 
-    MGMT_IP_list = ['10.10.20.177']
-    for MGMT_IP in devices.values():#not working yet
-        response = ADDY_table_return_interfaceIP(MGMT_IP)
+    #Mgmt_IP = ['10.10.20.177']
+    for items in devices.items():#need to test still
+        Mgmt_IP= items[1]
+        dev_name = items[0]
+        print("for device:\n"+ dev_name+" "*8)
+    #for Mgmt_IP in devices.values():#not working yet
+        response = ADDY_table_return_interfaceIP(Mgmt_IP)
         #print(response)
-        
-        
         vlan_IP_dict=vlans_only(response)
         print(vlan_IP_dict)
         NEWvlan_IP_dict =IP_change(vlan_IP_dict)
@@ -155,14 +157,16 @@ def main():
         for interface in NEWvlan_IP_dict.items():
             int_name= (interface[0])
             IP_addy = (interface[1])
-            command_to_change_IP_on_device(int_name,IP_addy,MGMT_IP)
-        ADDY_table_return_interfaceIP(MGMT_IP)
-
-
-
-
-
-
+            command_to_change_IP_on_device(int_name,IP_addy,Mgmt_IP)
+        ADDY_table_return_interfaceIP(Mgmt_IP)
 
 if __name__== "__main__" :
     main()
+
+ #####                                                #                         ######                             
+#     #  ####  #####  ######    #####  #   #          #  ####   ####  #    #    #     #   ##   #####  ####  #    # 
+#       #    # #    # #         #    #  # #           # #    # #      #    #    #     #  #  #    #   #    # #    # 
+#       #    # #    # #####     #####    #            # #    #  ####  ######    ######  #    #   #   #      ###### 
+#       #    # #    # #         #    #   #      #     # #    #      # #    #    #       ######   #   #      #    # 
+#     # #    # #    # #         #    #   #      #     # #    # #    # #    #    #       #    #   #   #    # #    # 
+ #####   ####  #####  ######    #####    #       #####   ####   ####  #    #    #       #    #   #    ####  #    # 
