@@ -2,7 +2,7 @@
 import requests
 import json
 import urllib3
-#urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #shut those warnings up, not a good idea in prod
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #shut those warnings up, not a good idea in prod
 
 #just show ip in br command
 def show_ip_int(mgmtIP):
@@ -35,7 +35,7 @@ def clean_json(response,intlist,protolist,link_state_list,ip_add_list):
 
 #create formated table from clean json
 def create_linkstatetable(intlist,protolist,link_state_list,ip_add_list):
-  print(f"Name\t\tProto\t\tLink\t\tAddress")
+  print(f"\nName\t\tProto\t\tLink\t\tAddress")
   print("-"*100)
   for count in range(len(intlist)):#chat gtp for the save with range
     print(f"{intlist[count]}\t\t{protolist[count]}\t\t{link_state_list[count]}\t\t{ip_add_list[count]}")
@@ -143,21 +143,22 @@ def main():
     devices = {"dist-sw01" : "10.10.20.177","dist-sw02" : "10.10.20.178"}
 
     #Mgmt_IP = ['10.10.20.177']
-    for items in devices.items():#need to test still
+    for items in devices.items():# I want both items for different reasons, mostly print clairity on what device this is happening to, otherwise i could just use other version
         Mgmt_IP= items[1]
         dev_name = items[0]
-        print("for device:\n"+ dev_name+" "*8)
-    #for Mgmt_IP in devices.values():#not working yet
+        print("for device:\n"+ (dev_name+" ")*8)
+    #for Mgmt_IP in devices.values():#other version
         response = ADDY_table_return_interfaceIP(Mgmt_IP)
         #print(response)
         vlan_IP_dict=vlans_only(response)
-        print(vlan_IP_dict)
+        #print(vlan_IP_dict)
         NEWvlan_IP_dict =IP_change(vlan_IP_dict)
-        print(NEWvlan_IP_dict)
+        #print(NEWvlan_IP_dict)
         for interface in NEWvlan_IP_dict.items():
             int_name= (interface[0])
             IP_addy = (interface[1])
             command_to_change_IP_on_device(int_name,IP_addy,Mgmt_IP)
+        print("NEW IP LIST")
         ADDY_table_return_interfaceIP(Mgmt_IP)
 
 if __name__== "__main__" :
