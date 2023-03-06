@@ -69,29 +69,43 @@ def vlans_only(dictionary):
     return vlans_dict
 
 #separates passed in dictionary values into lists and adds 5 to fourth octet
-def IP_separete(vlan_only_ipddy_dict):
-    newIPlist =[]
-    for vlansIP in vlan_only_ipddy_dict.values():
-        IPs_broken_asLIST = vlansIP.split(".")
-        for fourth_oct in IPs_broken_asLIST[3]:
-       #print(fourth_oct)
-            fourth_oct = int(fourth_oct)+5
-            IPs_broken_asLIST[3]=str(fourth_oct)
+def IP_add_5(IP_to_change):
+    #newIPlist =[]
+    #proof print(IP_to_change)
+    #for vlansIP in IP_to_change:
+        #print(vlansIP)
+    IPs_broken_asLIST = IP_to_change.split(".")
+    #proof print(f"4TH OCT {IPs_broken_asLIST[3]}")
+    oct_to_change = IPs_broken_asLIST[3]
+    #for fourth_oct in IPs_broken_asLIST[3]: leaving this for me....i was iterating over each digit which was giving me bad results when the old ip 4th oct had two digits, basically i didn't need a for loop here
+        #print(f"OLD {fourth_oct}")
+    fourth_oct = str(int(oct_to_change)+5)
+        #print(f"NEW {fourth_oct}")
+    IPs_broken_asLIST[3]=fourth_oct
     #print(IPs_broken_asLIST)
-            new_IP = ".".join(IPs_broken_asLIST)
-            newIPlist.append(new_IP)
-    return newIPlist
+    new_IP = ".".join(IPs_broken_asLIST)
+        #newIPlist=newIPlist+new_IP
+    #proof print(f"NEW IP {new_IP}")
+    return new_IP
 
 #takes in new IP values and changes the dictionary to new values while keeping that same keys
-def Change_vlansIP_new_IP(vlan_only_ipddy_dict,newIPlist):   
-    for replacement_value , key in enumerate(vlan_only_ipddy_dict.keys()):#use the enumerate() function to get the index of the current key CHATGPT
-       vlan_only_ipddy_dict[key] = newIPlist[replacement_value]
-    return vlan_only_ipddy_dict
+def Change_vlansIP_new_IP(Vlans,newIPlist):   
+    #for replacement_value , key in enumerate(vlan_only_ipddy_dict.keys()):#use the enumerate() function to get the index of the current key CHATGPT
+       #vlan_only_ipddy_dict[key] = newIPlist[replacement_value]
+    new_IP_dict = int_IP_dict(Vlans,newIPlist)
+    return new_IP_dict
 
 #takes in dict separates IPs by split, adds 5 then updates said dict with new values    
 def IP_change(vlan_only_ipddy_dict):
-    newIP_list = IP_separete(vlan_only_ipddy_dict)
-    updated_intIP_dict =Change_vlansIP_new_IP(vlan_only_ipddy_dict,newIP_list)
+    ip_to_change = vlan_only_ipddy_dict.values()
+    Vlans = vlan_only_ipddy_dict.keys()
+    newIP_list =[]
+    for item in ip_to_change:
+        newIP = IP_add_5(item)
+        newIP_list.append(newIP)
+
+    #proof print(f"new list {newIP_list}")
+    updated_intIP_dict =Change_vlansIP_new_IP(Vlans,newIP_list)
     return updated_intIP_dict
 
 #changes IP on cisco device    
@@ -151,9 +165,9 @@ def main():
         response = ADDY_table_return_interfaceIP(Mgmt_IP)
         #print(response)
         vlan_IP_dict=vlans_only(response)
-        #print(vlan_IP_dict)
+        #proof rint(vlan_IP_dict)
         NEWvlan_IP_dict =IP_change(vlan_IP_dict)
-        #print(NEWvlan_IP_dict)
+        #proof print(NEWvlan_IP_dict)
         for interface in NEWvlan_IP_dict.items():
             int_name= (interface[0])
             IP_addy = (interface[1])
