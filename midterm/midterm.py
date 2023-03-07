@@ -58,7 +58,7 @@ def ADDY_table_return_interfaceIP(url):
 #i will want interface names directly associated with their IP addresses this function will reassociate them back together again in a new dictionary, i thought this would be easier then recleaning my command return for different information    
 def intKEY_IPvalue_dict(interfaceLIST,ipLIST):
    #intIP = [interfaceLIST,ipLIST]
-   #intIPdict = {intIP[0][i]:intIP[1][i] for i in range(len(intIP))}
+   #intIPdict = {intIP[0][i]:intIP[1][i] for i in range(len(interfaceLIST))}
    intIPdict = {key:value for key, value in zip(interfaceLIST,ipLIST)}
    return intIPdict
 
