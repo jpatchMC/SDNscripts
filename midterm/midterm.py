@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 #josh patch
+
 import requests
 import json
 import urllib3
@@ -26,8 +28,8 @@ def show_ip_int(mgmtIP):
     return response
 
 #clean resonse from ip int command
-def clean_json(response,intlist,protolist,link_state_list,ip_add_list):
-  for create_lists in response['result']['body']['TABLE_intf']['ROW_intf']:#
+def clean_json(raw_json,intlist,protolist,link_state_list,ip_add_list):
+  for create_lists in raw_json['result']['body']['TABLE_intf']['ROW_intf']:
     intlist.append(create_lists['intf-name'])
     protolist.append(create_lists['proto-state'])  
     link_state_list.append(create_lists['link-state'])
@@ -50,11 +52,11 @@ def ADDY_table_return_interfaceIP(url):
     clean_json(response,intlist,protolist,link_state_list,ip_add_list)
     create_linkstatetable(intlist,protolist,link_state_list,ip_add_list)
     #return [intlist,ip_add_list]
-    interfaceKEY_ipaddyVALUE = int_IP_dict(intlist,ip_add_list)
+    interfaceKEY_ipaddyVALUE = intKEY_IPvalue_dict(intlist,ip_add_list)
     return interfaceKEY_ipaddyVALUE
 
 #i will want interface names directly associated with their IP addresses this function will reassociate them back together again in a new dictionary, i thought this would be easier then recleaning my command return for different information    
-def int_IP_dict(interfaceLIST,ipLIST):
+def intKEY_IPvalue_dict(interfaceLIST,ipLIST):
    #intIP = [interfaceLIST,ipLIST]
    #intIPdict = {intIP[0][i]:intIP[1][i] for i in range(len(intIP))}
    intIPdict = {key:value for key, value in zip(interfaceLIST,ipLIST)}
@@ -70,10 +72,7 @@ def vlans_only(dictionary):
 
 #separates passed in dictionary values into lists and adds 5 to fourth octet
 def IP_add_5(IP_to_change):
-    #newIPlist =[]
     #proof print(IP_to_change)
-    #for vlansIP in IP_to_change:
-        #print(vlansIP)
     IPs_broken_asLIST = IP_to_change.split(".")
     #proof print(f"4TH OCT {IPs_broken_asLIST[3]}")
     oct_to_change = IPs_broken_asLIST[3]
@@ -84,7 +83,6 @@ def IP_add_5(IP_to_change):
     IPs_broken_asLIST[3]=fourth_oct
     #print(IPs_broken_asLIST)
     new_IP = ".".join(IPs_broken_asLIST)
-        #newIPlist=newIPlist+new_IP
     #proof print(f"NEW IP {new_IP}")
     return new_IP
 
@@ -92,7 +90,7 @@ def IP_add_5(IP_to_change):
 def Change_vlansIP_new_IP(Vlans,newIPlist):   
     #for replacement_value , key in enumerate(vlan_only_ipddy_dict.keys()):#use the enumerate() function to get the index of the current key CHATGPT
        #vlan_only_ipddy_dict[key] = newIPlist[replacement_value]
-    new_IP_dict = int_IP_dict(Vlans,newIPlist)
+    new_IP_dict = intKEY_IPvalue_dict(Vlans,newIPlist)
     return new_IP_dict
 
 #takes in dict separates IPs by split, adds 5 then updates said dict with new values    
