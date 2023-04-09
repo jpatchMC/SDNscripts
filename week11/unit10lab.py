@@ -186,7 +186,7 @@ def change_address(ip,interface,newip,sub):
 
     response = requests.request("PUT", url, auth=(username,password),headers=headers, verify = False, data=json.dumps(payload)
     )
-    print(response.text)
+    #print(response.text)
 
 def main():
     ipAddr = "10.10.20.175"
