@@ -33,6 +33,7 @@ xmlInt = """<config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns = "
 
 
 def edit_config(router,xmlInt):
+    #edit the config of a router api call
     with manager.connect(host=router['host'],port=router['port'],username=router['username'],password=router['password'],hostkey_verify=False) as m:
 
         netconf_reply = m.edit_config(target = 'running', config = xmlInt)
@@ -40,6 +41,7 @@ def edit_config(router,xmlInt):
         return (netconf_reply)
 
 def edit_xml_for_edit(xmlInt,new_ip,interface_name,interface_number,new_subnet):
+    #adds values into xml scaffoling code
     xmlInt = xmlInt.replace("%addr%", new_ip)
     xmlInt = xmlInt.replace("%intName%", interface_name)
     xmlInt = xmlInt.replace("%intNum%", interface_number)
