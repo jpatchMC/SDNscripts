@@ -32,6 +32,7 @@ def read_file():
     return device
 
 def main():
+    #part 1###############################################
     device=read_file()
     #print(device)
     checkbool = ""
@@ -51,6 +52,8 @@ def main():
             device=Mod_Device(device,dev_to_mod,key_to_mod,new_value)
     
     write_to_file(device)
+    #part 2#########################3
+    device_now_mod=read_file()
 
 
 
