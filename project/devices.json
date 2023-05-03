@@ -1,0 +1,1 @@
+[{"hostname": "host1", "type": "nx", "managementIP": "1.1.1.1"}, {"hostname": "host2", "type": "api", "managementIP": "2.2.2.2"}]
