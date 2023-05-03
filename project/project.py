@@ -2,27 +2,31 @@ import json
 
 
 def add_to_device(device):
-    
+    #this will add / append to device inventory
     name= input("what is the name of the device?\t")
     dev_type= input("what kind of device is this?\t")
     mang_IP=input("what is the management IP address?\t")
     device.append({"hostname":name,"type":dev_type,"managementIP":mang_IP})
     return device
 def remove_device(device,dev_del):
+    #deletes device based on hostname
     for item in device:
         if item["hostname"] == dev_del:
             device.remove(item)
     return device
 def Mod_Device(device,dev_to_mod,key_to_mod,new_value):
+    #modify a device based on hostname and supplied key
     for item in device:
         if item["hostname"] == dev_to_mod:
             item[key_to_mod]=new_value
     return device
 def write_to_file(device):
+    #writes(save) to a .json file
     file = open("devices.json","w")
     file.write(json.dumps(device))
     file.close()
 def read_file():
+    #opens and reads .json file
     with open("devices.json","r")as file:
         device = json.load(file)
     return device
@@ -32,7 +36,8 @@ def main():
     #print(device)
     checkbool = ""
     while checkbool != "done":
-        print(device)
+        #while loop to keep it going until done if statements to be specific about what to do with a given input, this would be better as an argpars but whatever
+        print(device)#will might turn this into a table later
         checkbool =input("what would you like to do?:\nadd delete modify done\t")
         if checkbool=="add":
             device=add_to_device(device)
