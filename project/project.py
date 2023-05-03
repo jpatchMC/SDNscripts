@@ -9,6 +9,7 @@ def add_to_device(device):
     valbool = False
     while valbool==False:
         dev_type= input("what kind of device is this? nxos or iosxe\t")
+        dev_type=dev_type.lower()
         valbool=type_enforce(dev_type)    
     valboo=False
     while valboo == False:
@@ -17,7 +18,8 @@ def add_to_device(device):
     device.append({"hostname":name,"type":dev_type,"managementIP":mang_IP})
     return device
 def type_enforce(type):
-    print (type)
+    #enforce the only two types we want with the same formatting
+    #print (type)
     if type == "nxos" or type == "iosxe":
         valbool=True
     else:
@@ -36,7 +38,7 @@ def Mod_Device(device,dev_to_mod,key_to_mod,new_value):
             item[key_to_mod]=new_value
     return device
 def write_to_file(device):
-    #writes(save) to a .json file
+    #writes(save) to a .json file as json
     file = open("devices.json","w")
     file.write(json.dumps(device))
     file.close()
@@ -49,24 +51,19 @@ def read_file():
 def IPchecker(ip_ask): #ip ask is a string thats a question define in main
     check_number =ip_ask.replace(".","")
     if check_number.isnumeric(): 
-        IP_check = ip_ask.split(".") #i need to check them individually
+        IP_check = ip_ask.split(".") 
         if len(IP_check) == 4:
             A = int(IP_check[0])
             B = int(IP_check[1])
             C = int(IP_check[2])
             D = int(IP_check[3])
-            if A <= 255 and B <= 255 and C <= 255 and D <= 255:
-                #print(f"{ip_check} is valid")
+            if A <= 255 and B <= 255 and C <= 255 and D <= 255: 
                     valid_bool=True
-                    #return valid_bool
             else:
-                #print("needs to be a valid IP address")
                 valid_bool = False
-        else:
-            #print("need to be a properly formatted IP address(3 digets, dot 3 more. 4 groups total)")                
+        else:            
             valid_bool = False
     else:
-        #print("needs to be a valid IP address(with numbers)")
         valid_bool = False
     return valid_bool
 def main():
@@ -95,6 +92,7 @@ def main():
                 valuebool=False
                 while valuebool==False:
                     new_value=input("what will the new Value be?\t")
+                    new_value=new_value.lower()
                     valuebool=type_enforce(new_value)
             else:
                 new_value=input("what will the new Value be?\t")
