@@ -1,1 +1,1 @@
-[{"hostname": "host1", "type": "iosxe", "managementIP": "1.1.1.1"}, {"hostname": "host2", "type": "api", "managementIP": "2.2.2.2"}, {"hostname": "host3", "type": "nx", "managementIP": "1.2.3.4"}, {"hostname": "host4", "type": "nxos", "managementIP": "4.4.4.4"}]
+[{"hostname": "dist-rtr01", "type": "iosxe", "managementIP": "10.10.20.175"}, {"hostname": "dist-rtr02", "type": "iosxe", "managementIP": "10.10.20.176"}, {"hostname": "dist-sw01", "type": "nxos", "managementIP": "10.10.20.177"}, {"hostname": "dist-sw02", "type": "nxos", "managementIP": "10.10.20.178"}]

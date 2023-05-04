@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import json
-
+import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #shut those warnings up, not a good idea in prod
 
 def add_to_device(device):
     #this will add / append to device inventory
@@ -66,6 +68,334 @@ def IPchecker(ip_ask): #ip ask is a string thats a question define in main
     else:
         valid_bool = False
     return valid_bool
+
+def getCookie(addr) :
+
+#NX REST API Authen See REST API Reference for format of payload below
+
+    url = "https://"+ addr + "/api/aaaLogin.json"
+ 
+    payload= {"aaaUser" :
+              {"attributes" :
+                   {"name" : "cisco",
+                    "pwd" : "cisco"}
+               }
+          }
+
+    response = requests.post(url,json=payload,verify=False)
+    #print(response.json())
+    return response.json()["imdata"][0]["aaaLogin"]["attributes"]["token"]
+
+#Uses NAXPI DME model to take a mgmtIP, cookie and VLAN info. Creates and names a VLAN
+def create_vlan(addr,vlan_numb,vlan_name,cookie):
+    url = "https://"+addr+"/api/node/mo/sys.json"
+    headers = {
+    'Content-Type': 'application/json',
+    'Cookie': 'APIC-Cookie='+cookie
+    }
+    payload ={
+      "topSystem": {
+        "children": [
+          {
+            "bdEntity": {
+              "children": [
+                {
+                  "l2BD": {
+                    "attributes": {
+                      "fabEncap": vlan_numb,
+                      "name": vlan_name
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+    response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
+    return response.json()
+
+#Uses NAXPI DME model to take a mgmtIP, cookie and interface info. Creates and assigns an ip to an int.
+def create_svi(addr,int_name,new_ip,cookie):
+    url = "https://"+addr+"/api/node/mo/sys.json"
+    headers = {
+    'Content-Type': 'application/json',
+    'Cookie': 'APIC-Cookie='+cookie
+    }
+    payload ={
+      "topSystem": {
+        "children": [
+          {
+            "ipv4Entity": {
+              "children": [
+                {
+                  "ipv4Inst": {
+                    "children": [
+                      {
+                        "ipv4Dom": {
+                          "attributes": {
+                            "name": "default"
+                          },
+                          "children": [
+                            {
+                              "ipv4If": {
+                                "attributes": {
+                                  "id": int_name
+                                },
+                                "children": [
+                                  {
+                                    "ipv4Addr": {
+                                      "attributes": {
+                                        "addr": new_ip
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "interfaceEntity": {
+              "children": [
+                {
+                  "sviIf": {
+                    "attributes": {
+                      "adminSt": "up",
+                      "id": int_name
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+    response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
+    return response.json()
+
+#Uses NAXPI DME model to take a mgmtIP, cookie and HSRP info. Configures HSRP on an interface.
+
+def hsrp_config(addr,int_name,hsrp_group,hsrp_addr,cookie):
+    url = "https://"+addr+"/api/node/mo/sys.json"
+    headers = {
+    'Content-Type': 'application/json',
+    'Cookie': 'APIC-Cookie='+cookie
+    }
+    payload ={
+      "topSystem": {
+        "children": [
+          {
+            "interfaceEntity": {
+              "children": [
+                {
+                  "sviIf": {
+                    "attributes": {
+                      "id": int_name
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "hsrpEntity": {
+              "children": [
+                {
+                  "hsrpInst": {
+                    "children": [
+                      {
+                        "hsrpIf": {
+                          "attributes": {
+                            "id": int_name
+                          },
+                          "children": [
+                            {
+                              "hsrpGroup": {
+                                "attributes": {
+                                  "af": "ipv4",
+                                  "id": hsrp_group,
+                                  "ip": hsrp_addr,
+                                  "ipObtainMode": "admin"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+    response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
+    return response.json()
+
+#Uses NAXPI DME model to take a mgmtIP, cookie and OSPF info. Configures OSPF on an interface.
+def ospf_config(addr,int_name,ospf_id,ospf_area,cookie):
+    url = "https://"+addr+"/api/node/mo/sys.json"
+    headers = {
+    'Content-Type': 'application/json',
+    'Cookie': 'APIC-Cookie='+cookie
+    }
+    payload ={
+      "topSystem": {
+        "children": [
+          {
+            "ospfEntity": {
+              "children": [
+                {
+                  "ospfInst": {
+                    "attributes": {
+                      "name": ospf_id
+                    },
+                    "children": [
+                      {
+                        "ospfDom": {
+                          "attributes": {
+                            "name": "default"
+                          },
+                          "children": [
+                            {
+                              "ospfIf": {
+                                "attributes": {
+                                  "advertiseSecondaries": "yes",
+                                  "area": ospf_area,
+                                  "id": int_name
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "interfaceEntity": {
+              "children": [
+                {
+                  "sviIf": {
+                    "attributes": {
+                      "id": "vlan110"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+    response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
+    return response.json()
+
+#From the TurnipTheBeet git. swapped in variables for the mgmtIP, interface to change, and new ip.
+def ChangeAddressYang(ipAddr,intf_to_change,new_ip):
+    url = "https://"+ipAddr+":443/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet2"
+    username = 'cisco'
+    password = 'cisco'
+    payload={"ietf-interfaces:interface": {
+                        "name": intf_to_change,
+                        "description": "Configured by RESTCONF",
+                        "type": "iana-if-type:ethernetCsmacd",
+                        "enabled": "true",
+                                         "ietf-ip:ipv4": {
+                                                                "address": [{
+                                                                    "ip": new_ip,
+                                                                    "netmask": "255.255.255.252"
+                                                                    
+                                                                            }   ]
+                                                            }
+                                            }
+             }
+
+    headers = {
+      'Authorization': 'Basic cm9vdDpEX1ZheSFfMTAm',
+      'Accept': 'application/yang-data+json',
+      'Content-Type': 'application/yang-data+json'
+    }
+
+    response = requests.request("PUT", url, auth=(username,password),headers=headers, verify = False, data=json.dumps(payload))
+
+def get_interfaces(mgmt_IP):
+    #RESTCONF get ip interfaces for....something
+    #url = "https://10.10.20.175:443/restconf/data/ietf-yang-library:modules-state"
+    #url = "https://10.10.20.175:443/restconf/tailf/modules/ietf-interfaces/2014-05-08"
+    url = "https://"+mgmt_IP+":443/restconf/data/ietf-interfaces:interfaces"#Connectes to a web interface on the device
+    username = 'cisco'
+    password = 'cisco'
+    payload={}
+    headers = {
+      'Content-Type': 'application/yang-data+json',
+      'Accept': 'application/yang-data+json',
+      'Authorization': 'Basic cm9vdDpEX1ZheSFfMTAm'
+    }
+
+    response = requests.request("GET", url, auth = (username,password), verify = False, headers=headers, data=payload)
+    #print(response.text)
+    #print(str(response["ietf-interfaces:interfaces"]["interface"][0]["ietf-ip:ipv4"]["address"][0]))
+    return response.json()
+
+def interface_ip4(addr,cookie):
+    #DME get interfaces from nxos devices
+    url = "https://"+addr+"/api/node/mo/sys/ipv4/inst/dom-default.json?query-target=children"#
+                          
+    #auth_cookie={"APIC-cookie" : cookie} can be use interchangable with the "headers" varible format
+    payload=None
+    headers = {'Content-Type' : 'text/plain','Cookie' : 'APIC-Cookie='+cookie}
+    response= requests.request("GET",url,data=json.dumps(payload),headers=headers,verify=False)#cookies=auth_cookie,
+    #response = requests.request("GET", url, data=json.dumps(payload), cookies=auth_cookie,verify=False)
+    return response.json()
+
+def individual_interface_ip4(addr,cookie,interface):
+    #DME get interface IP from specific int
+    url = "https://"+addr+"/api/node/mo/sys/ipv4/inst/dom-default/if-["+interface+"].json?query-target=children"#
+                          
+    #auth_cookie={"APIC-cookie" : cookie} can be use interchangable with the "headers" varible format
+    payload=None
+    headers = {'Content-Type' : 'text/plain','Cookie' : 'APIC-Cookie='+cookie}
+    response= requests.request("GET",url,data=json.dumps(payload),headers=headers,verify=False)#cookies=auth_cookie,
+    #response = requests.request("GET", url, data=json.dumps(payload), cookies=auth_cookie,verify=False)
+    true_response= response.json()
+
+    return true_response['imdata'][0]['ipv4Addr']['attributes']['addr']
+
+def IP_changer(ip_address):
+    #changes the 2nd octet while retaining the other info
+    new_oct = "31"
+    ipsplit = ip_address.split(".")
+    ipsplit[1]=new_oct
+    new_IP=".".join(ipsplit)
+    return new_IP
+
+
+
+
+
+
+
+
+
+
+
+
 def main():
     #part 1###############################################
     device=read_file()
@@ -101,7 +431,29 @@ def main():
     write_to_file(device)
     #part 2#########################3
     device_now_mod=read_file()
+    #print(device_now_mod)
+    for ind_dev_nxos in device_now_mod:
+        if  'nxos'==ind_dev_nxos['type'] :#DME
+            #print(ind_dev_nxos)
+            nxosIP=(ind_dev_nxos['managementIP'])
+            print(nxosIP)
+            nxoscookie=getCookie(nxosIP)
+            nxosints=interface_ip4(nxosIP,nxoscookie)
+            
+            #print(nxosints)
+            for interfaces in nxosints['imdata']:
+                individual_int=(interfaces['ipv4If']['attributes']['id'])
+                indi_IP_per_int= individual_interface_ip4(nxosIP,nxoscookie,individual_int)
+                #print(indi_IP_per_int)
+                New_int_ip= IP_changer(indi_IP_per_int)
+                print(New_int_ip)
 
+
+
+    for ind_dev_iosxe in device_now_mod:
+        if 'iosxe' == ind_dev_iosxe['type']:#yang? netconf
+            #print(ind_dev_iosxe)
+            iosxeIP=(ind_dev_iosxe['managementIP'])
 
 
     
