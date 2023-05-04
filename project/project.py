@@ -385,9 +385,31 @@ def IP_changer(ip_address):
     new_IP=".".join(ipsplit)
     return new_IP
 
+def break_num_out_int(vlanint):
+    numbers = vlanint[4:]
+    return numbers
+
+def actually_change_interface_ip(addr,cookie,interface,New_addy):
+    url = "https://"+addr+"/api/node/mo/sys/ipv4/inst/dom-default/if-["+interface+"].json?query-target=children"
+
+    payload = {
+    "ipv4Addr": {
+        "attributes": {
+        "addr": New_addy,
+        "type": "primary"
+    } }}
 
 
 
+    headers = {
+    'Content-Type': 'application/json',
+    'Cookie': 'APIC-cookie=' + cookie
+    }
+
+
+    response = requests.request("POST", url, headers=headers, verify = False, data=json.dumps(payload))
+
+    #print(response.text)
 
 
 
@@ -446,7 +468,9 @@ def main():
                 indi_IP_per_int= individual_interface_ip4(nxosIP,nxoscookie,individual_int)
                 #print(indi_IP_per_int)
                 New_int_ip= IP_changer(indi_IP_per_int)
-                print(New_int_ip)
+                #print(New_int_ip)
+                actually_change_interface_ip(nxosIP,nxoscookie,individual_int,New_int_ip)
+                
 
 
 
