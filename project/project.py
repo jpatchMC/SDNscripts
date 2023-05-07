@@ -411,7 +411,12 @@ def actually_change_interface_ip(addr,cookie,interface,New_addy):
 
     #print(response.text)
 
-
+def set_new_hsrp_IP(vlan_interface):
+    #we know all the addresses are 172.32.something.1 and something is always the valn number, maybe using naming conventions to figure this out is iffy but then why use naming conventions
+    # UNTESTED 
+    vlan_number = vlan_interface[4:]
+    new_hsrp= "172.31."+vlan_number+".1"
+    return new_hsrp
 
 
 
@@ -470,7 +475,10 @@ def main():
                 New_int_ip= IP_changer(indi_IP_per_int)
                 #print(New_int_ip)
                 actually_change_interface_ip(nxosIP,nxoscookie,individual_int,New_int_ip)
-                
+                #verify vlan and not something else???
+                nxos_hsrp_address = set_new_hsrp_IP(individual_int)
+                hsrp_config(nxosIP,individual_int,hsrp_group,nxos_hsrp_address,nxoscookie)#whats the group?
+                ospf_config(nxosIP,individual_int,ospf_id,ospf_area,nxoscookie) # whats the id and area?
 
 
 
