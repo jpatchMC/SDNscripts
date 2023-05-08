@@ -492,7 +492,7 @@ def main():
         if checkbool=="add":
             device=add_to_device(device)
         if checkbool == "delete":
-            dev_del=input("what host?" )
+            dev_del=input("what host? " )
             device=remove_device(device,dev_del)
         if checkbool == "modify":
             dev_to_mod = input("which hostname are we modifing?\t")
