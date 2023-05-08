@@ -6,7 +6,18 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #shut those warnings up, not a good idea in prod
 from ncclient import manager
 import xmltodict
+import os
 
+def check_file_exists():
+    #checks if devices.json exists in current directory, if no make empty list if yes opens file, passes to varible
+    file_path = "devices.json"
+    if os.path.isfile(file_path):
+        device=read_file()
+        print(f"The file '{file_path}' exists.")
+    else:
+        device = []
+        print(f"The file '{file_path}' does not exist.")
+    return device
 def add_to_device(device):
     #this will add / append to device inventory
     name= input("what is the name of the device?\t")
@@ -470,7 +481,8 @@ def get_interfaces(ip_address):
 
 def main():
     #part 1###############################################
-    device=read_file()
+    device =check_file_exists()
+    #device=read_file()
     #print(device)
     checkbool = ""
     while checkbool != "done":
