@@ -71,11 +71,11 @@ def IPchecker(ip_ask): #ip ask is a string thats a question define in main
         valid_bool = False
     return valid_bool
 
-def getCookie(addr) :
+def getCookie(mgmt_IP) :
 
 #NX REST API Authen See REST API Reference for format of payload below
 
-    url = "https://"+ addr + "/api/aaaLogin.json"
+    url = "https://"+ mgmt_IP + "/api/aaaLogin.json"
  
     payload= {"aaaUser" :
               {"attributes" :
@@ -308,7 +308,7 @@ def ospf_config(addr,int_name,ospf_id,ospf_area,cookie):
     response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
     return response.json()
 
-#From the TurnipTheBeet git. swapped in variables for the mgmtIP, interface to change, and new ip.
+#From the TurnipTheBeet git. swapped in variables for the mgmtIP, interface to change, and new ip. note, subnet is hard coded since for our current devices all of them are point to point networks
 def ChangeAddressYang(ipAddr,new_ip,interface):
     url = "https://"+ipAddr+":443/restconf/data/ietf-interfaces:interfaces/interface="+interface
     username = 'cisco'
