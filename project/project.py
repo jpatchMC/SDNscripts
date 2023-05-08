@@ -415,8 +415,8 @@ def actually_change_interface_ip(addr,cookie,interface,New_addy):
 
 def generate_new_hsrp_IP(vlan_interface):
     #we know all the addresses are 172.31.something.1 and something is always the vlan number, maybe using naming conventions to figure this out is iffy but then why use naming conventions
-     
-    vlan_number = vlan_interface[4:]
+    vlan_number=break_num_out_int(vlan_interface) 
+    #vlan_number = vlan_interface[4:]
     new_hsrp= "172.31."+vlan_number+".1"
     return new_hsrp
 
