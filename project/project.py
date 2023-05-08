@@ -4,6 +4,8 @@ import json
 import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #shut those warnings up, not a good idea in prod
+from ncclient import manager
+import xmltodict
 
 def add_to_device(device):
     #this will add / append to device inventory
@@ -87,7 +89,7 @@ def getCookie(addr) :
     return response.json()["imdata"][0]["aaaLogin"]["attributes"]["token"]
 
 #Uses NAXPI DME model to take a mgmtIP, cookie and VLAN info. Creates and names a VLAN
-def create_vlan(addr,vlan_numb,vlan_name,cookie):
+def create_vlan(addr,vlan_numb,cookie):
     url = "https://"+addr+"/api/node/mo/sys.json"
     headers = {
     'Content-Type': 'application/json',
@@ -103,7 +105,7 @@ def create_vlan(addr,vlan_numb,vlan_name,cookie):
                   "l2BD": {
                     "attributes": {
                       "fabEncap": vlan_numb,
-                      "name": vlan_name
+                      "name": "projectTest"
                     }
                   }
                 }
@@ -307,12 +309,12 @@ def ospf_config(addr,int_name,ospf_id,ospf_area,cookie):
     return response.json()
 
 #From the TurnipTheBeet git. swapped in variables for the mgmtIP, interface to change, and new ip.
-def ChangeAddressYang(ipAddr,intf_to_change,new_ip):
-    url = "https://"+ipAddr+":443/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet2"
+def ChangeAddressYang(ipAddr,new_ip,interface):
+    url = "https://"+ipAddr+":443/restconf/data/ietf-interfaces:interfaces/interface="+interface
     username = 'cisco'
     password = 'cisco'
     payload={"ietf-interfaces:interface": {
-                        "name": intf_to_change,
+                        "name": interface,
                         "description": "Configured by RESTCONF",
                         "type": "iana-if-type:ethernetCsmacd",
                         "enabled": "true",
@@ -411,17 +413,60 @@ def actually_change_interface_ip(addr,cookie,interface,New_addy):
 
     #print(response.text)
 
-def set_new_hsrp_IP(vlan_interface):
-    #we know all the addresses are 172.32.something.1 and something is always the valn number, maybe using naming conventions to figure this out is iffy but then why use naming conventions
-    # UNTESTED 
+def generate_new_hsrp_IP(vlan_interface):
+    #we know all the addresses are 172.31.something.1 and something is always the vlan number, maybe using naming conventions to figure this out is iffy but then why use naming conventions
+     
     vlan_number = vlan_interface[4:]
     new_hsrp= "172.31."+vlan_number+".1"
     return new_hsrp
 
+def add_new_vlan(nxosChangeCount,cookie,mngmtIP):
+  #we know all the addresses are 172.31.vlan. something depending on the switch and if its hsrp , maybe using naming conventions to figure this out is iffy but then why use naming conventions
+  #anyway this adds a new vlan with IP and hsrp and ospf based on HOW MANY TIMES WE'VE INTERATED THROUGH NXOS SWITCHES
+  vlan_svi_IP = "172.31.120."+str(nxosChangeCount)+"/24"
+  #print(vlan_svi_IP)
+  interface_ID = "vlan120"
+  vlan_numb= "vlan-120"
+  HSRP_IP_addy = "172.31.120.1"
+  hsrp_group = "10"
+  ospf_id = "1"
+  ospf_area = "0.0.0.0"
+  create_vlan(mngmtIP,vlan_numb,cookie)
+  create_svi(mngmtIP,interface_ID,vlan_svi_IP,cookie)
+  hsrp_config(mngmtIP,interface_ID,hsrp_group,HSRP_IP_addy,cookie)
+  ospf_config(mngmtIP,interface_ID,ospf_id,ospf_area,cookie)
 
+def get_int_call(router):
+    #gets info about interfaces in use, their names and IP
+    netconf_filter = """
 
+    <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+        <interface></interface>
+    </interfaces>
+    
+    """
 
+    with manager.connect(host=router['host'],port=router['port'],username=router['username'],password=router['password'],hostkey_verify=False) as m:
+        netconf_reply = m.get_config(source = 'running', filter = ("subtree",netconf_filter))
+    netconf_data = xmltodict.parse(netconf_reply.xml)["rpc-reply"]["data"]
+    interfaces = netconf_data["interfaces"]["interface"]
+    return interfaces
+#Function to take an IP address as an argument and retrieve the IP address and subnet masks of the interfaces on a device.
+def get_interfaces(ip_address):
+  url = f"https://{ip_address}:443/restconf/data/ietf-interfaces:interfaces"
+  username = 'cisco'
+  password = 'cisco'
+  payload={}
+  headers = {
+  'Content-Type': 'application/yang-data+json',
+  'Accept': 'application/yang-data+json',
+  'Authorization': 'Basic cm9vdDpEX1ZheSFfMTAm'
+  }
 
+  #Function sends an HTTP GET request to RESTCONF API
+  response = requests.request("GET", url, auth = (username,password), verify = False, headers=headers, data=payload)
+  response_dict = json.loads(response.text) #Response from device is in JSON format (parsed here by the .loads() method)
+  return response_dict
 
 def main():
     #part 1###############################################
@@ -459,15 +504,16 @@ def main():
     #part 2#########################3
     device_now_mod=read_file()
     #print(device_now_mod)
+    nxosChangeCount = 2
+    
     for ind_dev_nxos in device_now_mod:
         if  'nxos'==ind_dev_nxos['type'] :#DME
             #print(ind_dev_nxos)
             nxosIP=(ind_dev_nxos['managementIP'])
-            print(nxosIP)
+            #print(nxosIP)
+            #print(nxosChangeCount)
             nxoscookie=getCookie(nxosIP)
             nxosints=interface_ip4(nxosIP,nxoscookie)
-            
-            #print(nxosints)
             for interfaces in nxosints['imdata']:
                 individual_int=(interfaces['ipv4If']['attributes']['id'])
                 indi_IP_per_int= individual_interface_ip4(nxosIP,nxoscookie,individual_int)
@@ -475,18 +521,45 @@ def main():
                 New_int_ip= IP_changer(indi_IP_per_int)
                 #print(New_int_ip)
                 actually_change_interface_ip(nxosIP,nxoscookie,individual_int,New_int_ip)
-                #verify vlan and not something else???
-                nxos_hsrp_address = set_new_hsrp_IP(individual_int)
-                hsrp_config(nxosIP,individual_int,hsrp_group,nxos_hsrp_address,nxoscookie)#whats the group?
+                #verify vlan and not something else
+                if individual_int[:4] == "vlan":
+                  nxos_hsrp_address = generate_new_hsrp_IP(individual_int)
+                  hsrp_group= "10"
+                  hsrp_config(nxosIP,individual_int,hsrp_group,nxos_hsrp_address,nxoscookie)#whats the group?
+                ospf_id = "1"
+                ospf_area = "0.0.0.0"
                 ospf_config(nxosIP,individual_int,ospf_id,ospf_area,nxoscookie) # whats the id and area?
-
+            #add the vlan120
+            add_new_vlan(nxosChangeCount,nxoscookie,nxosIP)
+            nxosChangeCount = nxosChangeCount +1
+            #print(nxosChangeCount)
 
 
     for ind_dev_iosxe in device_now_mod:
-        if 'iosxe' == ind_dev_iosxe['type']:#yang? netconf
+        if 'iosxe' == ind_dev_iosxe['type']:#yang? netconf restconf
             #print(ind_dev_iosxe)
             iosxeIP=(ind_dev_iosxe['managementIP'])
+            print(iosxeIP)
+            router = {"host": iosxeIP, "port" : "830","username":"cisco","password":"cisco"}
+            IOSXE_interfaces = get_int_call(router)
+            #print(IOSXE_interfaces)
+            #IOSXE_int_IP_list=[]
+            for interface in IOSXE_interfaces:
+                if interface['name'] != "Loopback0":
+                  if interface['name'] !="GigabitEthernet1":
+                    IOSXE_interface_name=interface['name']
+                    ISOSXE_interface_ip = interface['ipv4']['address']['ip']
+                    NEW_IOS_int_ip = IP_changer(ISOSXE_interface_ip)
+                    #print(IOSXE_interface_name)
+                    #print(NEW_IOS_int_ip)
+                    ChangeAddressYang(iosxeIP,NEW_IOS_int_ip,IOSXE_interface_name)
+                    #response =get_interfaces(iosxeIP)
+                    #print(response)
+            
 
+
+                
+            
 
     
 
