@@ -99,7 +99,7 @@ def getCookie(mgmt_IP) :
     #print(response.json())
     return response.json()["imdata"][0]["aaaLogin"]["attributes"]["token"]
 
-#Uses NAXPI DME model to take a mgmtIP, cookie and VLAN info. Creates and names a VLAN
+#Uses NAXPI DME model to take a mgmtIP, cookie and VLAN info. Creates and names a VLAN from a lab
 def create_vlan(addr,vlan_numb,cookie):
     url = "https://"+addr+"/api/node/mo/sys.json"
     headers = {
@@ -129,7 +129,7 @@ def create_vlan(addr,vlan_numb,cookie):
     response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
     return response.json()
 
-#Uses NAXPI DME model to take a mgmtIP, cookie and interface info. Creates and assigns an ip to an int.
+#Uses NAXPI DME model to take a mgmtIP, cookie and interface info. Creates and assigns an ip to an int. from a lab
 def create_svi(addr,int_name,new_ip,cookie):
     url = "https://"+addr+"/api/node/mo/sys.json"
     headers = {
@@ -196,7 +196,7 @@ def create_svi(addr,int_name,new_ip,cookie):
     response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
     return response.json()
 
-#Uses NAXPI DME model to take a mgmtIP, cookie and HSRP info. Configures HSRP on an interface.
+#Uses NAXPI DME model to take a mgmtIP, cookie and HSRP info. Configures HSRP on an interface.from a lab
 
 def hsrp_config(addr,int_name,hsrp_group,hsrp_addr,cookie):
     url = "https://"+addr+"/api/node/mo/sys.json"
@@ -257,7 +257,7 @@ def hsrp_config(addr,int_name,hsrp_group,hsrp_addr,cookie):
     response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
     return response.json()
 
-#Uses NAXPI DME model to take a mgmtIP, cookie and OSPF info. Configures OSPF on an interface.
+#Uses NAXPI DME model to take a mgmtIP, cookie and OSPF info. Configures OSPF on an interface.from a lab
 def ospf_config(addr,int_name,ospf_id,ospf_area,cookie):
     url = "https://"+addr+"/api/node/mo/sys.json"
     headers = {
@@ -319,7 +319,7 @@ def ospf_config(addr,int_name,ospf_id,ospf_area,cookie):
     response = requests.request("POST",url,verify=False,headers=headers,data=json.dumps(payload))
     return response.json()
 
-#From the TurnipTheBeet git. swapped in variables for the mgmtIP, interface to change, and new ip. note, subnet is hard coded since for our current devices all of them are point to point networks
+#From the TurnipTheBeet git. swapped in variables for the mgmtIP, interface to change, and new ip. note, subnet is hard coded since for our current devices all of them are point to point networks from a lab
 def ChangeAddressYang(ipAddr,new_ip,interface):
     url = "https://"+ipAddr+":443/restconf/data/ietf-interfaces:interfaces/interface="+interface
     username = 'cisco'
@@ -367,7 +367,7 @@ def get_interfaces(mgmt_IP):
     return response.json()
 
 def interface_ip4(addr,cookie):
-    #DME get interfaces from nxos devices
+    #DME get interfaces from nxos devices from a lab
     url = "https://"+addr+"/api/node/mo/sys/ipv4/inst/dom-default.json?query-target=children"#
                           
     #auth_cookie={"APIC-cookie" : cookie} can be use interchangable with the "headers" varible format
@@ -378,7 +378,7 @@ def interface_ip4(addr,cookie):
     return response.json()
 
 def individual_interface_ip4(addr,cookie,interface):
-    #DME get interface IP from specific int
+    #DME get interface IP from specific int from a lab
     url = "https://"+addr+"/api/node/mo/sys/ipv4/inst/dom-default/if-["+interface+"].json?query-target=children"#
                           
     #auth_cookie={"APIC-cookie" : cookie} can be use interchangable with the "headers" varible format
@@ -391,7 +391,7 @@ def individual_interface_ip4(addr,cookie,interface):
     return true_response['imdata'][0]['ipv4Addr']['attributes']['addr']
 
 def IP_changer(ip_address):
-    #changes the 2nd octet while retaining the other info
+    #changes the 2nd octet while retaining the other info 
     new_oct = "31"
     ipsplit = ip_address.split(".")
     ipsplit[1]=new_oct
@@ -399,10 +399,11 @@ def IP_changer(ip_address):
     return new_IP
 
 def break_num_out_int(vlanint):
+    #take letters from vlan interface name and returns
     numbers = vlanint[4:]
     return numbers
 
-def actually_change_interface_ip(addr,cookie,interface,New_addy):
+def actually_change_interface_ip(addr,cookie,interface,New_addy): #from a lab changes interface svi address
     url = "https://"+addr+"/api/node/mo/sys/ipv4/inst/dom-default/if-["+interface+"].json?query-target=children"
 
     payload = {
